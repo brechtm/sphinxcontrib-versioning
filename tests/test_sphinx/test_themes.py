@@ -50,7 +50,7 @@ def test_supported(tmpdir, local_docs, run, theme):
     assert 'master' not in contents_n
 
     # Build with versions.
-    build(str(local_docs), str(target_y), versions, 'master', ['-D', 'html_theme=' + theme])
+    build(str(local_docs), str(target_y), versions, 'master', '', ['-D', 'html_theme=' + theme])
     contents_y = target_y.join('contents.html').read()
     assert 'master' in contents_y
 
@@ -76,7 +76,7 @@ def test_sphinx_rtd_theme(tmpdir, local_docs):
     # Build branches only.
     target_b = tmpdir.ensure_dir('target_b')
     versions = Versions([('', 'master', 'heads', 1, 'conf.py'), ('', 'feature', 'heads', 2, 'conf.py')], ['semver'])
-    build(str(local_docs), str(target_b), versions, 'master', list())
+    build(str(local_docs), str(target_b), versions, 'master', '', list())
     contents = target_b.join('contents.html').read()
     assert '<dt>Branches</dt>' in contents
     assert '<dt>Tags</dt>' not in contents
@@ -84,7 +84,7 @@ def test_sphinx_rtd_theme(tmpdir, local_docs):
     # Build tags only.
     target_t = tmpdir.ensure_dir('target_t')
     versions = Versions([('', 'v1.0.0', 'tags', 3, 'conf.py'), ('', 'v1.2.0', 'tags', 4, 'conf.py')], sort=['semver'])
-    build(str(local_docs), str(target_t), versions, 'v1.2.0', list())
+    build(str(local_docs), str(target_t), versions, 'v1.2.0', '', list())
     contents = target_t.join('contents.html').read()
     assert '<dt>Branches</dt>' not in contents
     assert '<dt>Tags</dt>' in contents
@@ -95,7 +95,7 @@ def test_sphinx_rtd_theme(tmpdir, local_docs):
         ('', 'master', 'heads', 1, 'conf.py'), ('', 'feature', 'heads', 2, 'conf.py'),
         ('', 'v1.0.0', 'tags', 3, 'conf.py'), ('', 'v1.2.0', 'tags', 4, 'conf.py')
     ], sort=['semver'])
-    build(str(local_docs), str(target_bt), versions, 'master', list())
+    build(str(local_docs), str(target_bt), versions, 'master', '', list())
     contents = target_bt.join('contents.html').read()
     assert '<dt>Branches</dt>' in contents
     assert '<dt>Tags</dt>' in contents

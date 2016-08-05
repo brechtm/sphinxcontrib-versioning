@@ -90,7 +90,7 @@ def pre_build(local_root, versions, root_ref, overflow):
     with TempDir() as temp_dir:
         log.debug('Building root ref (before setting URLs) in temporary directory: %s', temp_dir)
         source = os.path.dirname(os.path.join(exported_root, root_remote['sha'], root_remote['conf_rel_path']))
-        build(source, temp_dir, versions, root_remote['name'], overflow)
+        build(source, temp_dir, versions, root_remote['name'], '', overflow)
         existing = os.listdir(temp_dir)
 
     # Define directory paths in URLs in versions. Skip the root ref (will remain '.').
@@ -136,7 +136,7 @@ def build_all(exported_root, destination, versions, root_ref, overflow):
         # Build root ref.
         log.info('Building root ref: %s', root_remote['name'])
         source = os.path.dirname(os.path.join(exported_root, root_remote['sha'], root_remote['conf_rel_path']))
-        build(source, destination, versions, root_remote['name'], overflow)
+        build(source, destination, versions, root_remote['name'], '', overflow)
 
         # Build other refs.
         for remote in list(r for r in versions.remotes if r != root_remote):
@@ -144,7 +144,7 @@ def build_all(exported_root, destination, versions, root_ref, overflow):
             source = os.path.dirname(os.path.join(exported_root, remote['sha'], remote['conf_rel_path']))
             target = os.path.join(destination, os.path.dirname(remote['url']))
             try:
-                build(source, target, versions.copy(1), remote['name'], overflow)
+                build(source, target, versions.copy(1), remote['name'], '', overflow)
             except HandledError:
                 log.warning('Skipping. Will not be building %s. Rebuilding everything.', remote['name'])
                 versions.remotes.pop(versions.remotes.index(remote))

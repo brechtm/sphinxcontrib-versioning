@@ -101,13 +101,16 @@ class ConfigInject(Config):
         self.extensions.append('sphinxcontrib.versioning.sphinx_')
 
 
-def _build(argv, versions, current_name):
+def _build(argv, versions, current_name, banner):
     """Build Sphinx docs via multiprocessing for isolation.
 
     :param iter argv: Arguments to pass to Sphinx.
     :param versions: Version class instance.
     :param str current_name: The ref name of the current version being built.
+    :param str banner: Display a banner at the top of every page with this message if set.
     """
+    if banner:
+        raise NotImplementedError
     # Patch.
     application.Config = ConfigInject
     EventHandlers.CURRENT_VERSION = current_name
@@ -131,13 +134,13 @@ def _read_config(argv, current_name, queue):
     cmdline.Sphinx = SphinxBuildAbort
 
     # Run.
-    _build(argv, list(), current_name)
+    _build(argv, list(), current_name, '')
 
     # Store.
     queue.put(SphinxBuildAbort.SPECIFIC_CONFIG)
 
 
-def build(source, target, versions, current_name, overflow):
+def build(source, target, versions, current_name, banner, overflow):
     """Build Sphinx docs for one version. Includes Versions class instance with names/urls in the HTML context.
 
     :raise HandledError: If sphinx-build fails. Will be logged before raising.
@@ -146,12 +149,13 @@ def build(source, target, versions, current_name, overflow):
     :param str target: Destination directory to write documentation to (passed to sphinx-build).
     :param sphinxcontrib.versioning.versions.Versions versions: Version class instance.
     :param str current_name: The ref name of the current version being built.
+    :param str banner: Display a banner at the top of every page with this message if set.
     :param list overflow: Overflow command line options to pass to sphinx-build.
     """
     log = logging.getLogger(__name__)
     argv = ['sphinx-build', source, target] + overflow
     log.debug('Running sphinx-build for %s with args: %s', current_name, str(argv))
-    child = multiprocessing.Process(target=_build, args=(argv, versions, current_name))
+    child = multiprocessing.Process(target=_build, args=(argv, versions, current_name, banner))
     child.start()
     child.join()  # Block.
     if child.exitcode != 0:
