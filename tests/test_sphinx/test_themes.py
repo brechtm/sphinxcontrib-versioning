@@ -111,8 +111,10 @@ def test_banner(tmpdir, local_docs, theme):
     :param local_docs: conftest fixture.
     :param str theme: Theme name to use.
     """
+    if theme not in ('sphinx_rtd_theme',):
+        return pytest.skip('TODO')
     banner = '<b>Banner Goes Here</b>'
-    target = tmpdir.ensure_dir('target_y')
+    target = tmpdir.ensure_dir('target')
     versions = Versions([('', 'master', 'heads', 1, 'conf.py')])
 
     # Build.
