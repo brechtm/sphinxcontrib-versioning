@@ -59,38 +59,8 @@ def gather_git_info(root, conf_rel_paths):
     return root, filtered_remotes
 
 
-def set_remotes_values(exported_root, remotes, overflow, no_banner):
-    """Set specific values in remotes dictionaries.
-
-    :param str exported_root: Tempdir path with exported commits as subdirectories.
-    :param iter remotes: List of dicts for every branch/tag.
-    :param list overflow: Overflow command line options to pass to sphinx-build.
-    :param bool no_banner: Disable the warning banner on non-root-refs.
-    """
-    log = logging.getLogger(__name__)
-
-    # Define master_doc file paths in URLs in versions.
-    for remote in list(remotes):
-        log.debug('Partially running sphinx-build to read configuration for: %s', remote['name'])
-        source = os.path.dirname(os.path.join(exported_root, remote['sha'], remote['conf_rel_path']))
-        try:
-            config = read_config(source, remote['name'], overflow)
-        except HandledError:
-            log.warning('Skipping. Will not be building: %s', remote['name'])
-            remotes.pop(remotes.index(remote))
-            continue
-        url = os.path.join(remote['url'], '{}.html'.format(config['master_doc']))
-        if url.startswith('./'):
-            url = url[2:]
-        remote['url'] = url
-
-    # Set banner string.
-    for remote in list() if no_banner else remotes:
-        assert remote
-
-
-def pre_build(local_root, versions, root_ref, overflow, no_banner):
-    """Build docs for all versions to determine URL (non-root directory name and master_doc names) and banner.
+def pre_build(local_root, versions, root_ref, overflow):
+    """Build docs for all versions to determine URL (non-root directory name and master_doc names).
 
     Need to build docs to (a) avoid filename collision with files from root_ref and branch/tag names and (b) determine
     master_doc config values for all versions (in case master_doc changes from e.g. contents.rst to index.rst between
@@ -102,7 +72,6 @@ def pre_build(local_root, versions, root_ref, overflow, no_banner):
     :param sphinxcontrib.versioning.versions.Versions versions: Version class instance.
     :param str root_ref: Branch/tag at the root of all HTML docs. Other branches/tags will be in subdirectories.
     :param list overflow: Overflow command line options to pass to sphinx-build.
-    :param bool no_banner: Disable the warning banner on non-root-refs.
 
     :return: Tempdir path with exported commits as subdirectories.
     :rtype: str
@@ -133,10 +102,63 @@ def pre_build(local_root, versions, root_ref, overflow, no_banner):
         log.debug('%s has url %s', remote['name'], remote['url'])
         existing.append(url)
 
-    # Update remotes dictionaries.
-    set_remotes_values(exported_root, versions.remotes, overflow, no_banner)
+    # Define master_doc file paths in URLs in versions.
+    for remote in list(versions.remotes):
+        log.debug('Partially running sphinx-build to read configuration for: %s', remote['name'])
+        source = os.path.dirname(os.path.join(exported_root, remote['sha'], remote['conf_rel_path']))
+        try:
+            config = read_config(source, remote['name'], overflow)
+        except HandledError:
+            log.warning('Skipping. Will not be building: %s', remote['name'])
+            versions.remotes.pop(versions.remotes.index(remote))
+            continue
+        url = os.path.join(remote['url'], '{}.html'.format(config['master_doc']))
+        if url.startswith('./'):
+            url = url[2:]
+        remote['url'] = url
 
     return exported_root
+
+
+BANNER_ROOT_BRANCH = 'Warning: This document is for the development version of {project}.'
+BANNER_ROOT_BRANCH_ROOT_EXISTS = ' <a href="{url}">Click here</a> for the main version of this document.'
+BANNER_ROOT_TAG_ON_BRANCH = 'Warning: This document is for the development version of {project}.'
+BANNER_ROOT_TAG_ON_TAG = 'Warning: This document is for an old version of {project}.'
+BANNER_ROOT_TAG_ROOT_EXISTS = ' The latest version is <a href="{url}">{version}</a>.'
+
+
+def set_banners(versions, root_ref):
+    """Set the banner message on all dicts in remotes.
+
+    if root ref is -t/-T:
+        if branch:
+            Warning: This documentation is for the development version of $project.
+            if exists in root ref:
+                The latest (-t)/recent (-T) version is <a>$version</a>.
+        if older tag:
+            Warning: This documentation is for an old version of $project.
+            if exists in root ref:
+                 The latest (-t)/recent (-T) version is <a>$version</a>.
+    if root ref is branch:
+        Warning: This documentation is for the development version of $project.
+        if exists in root ref:
+            Click here for the main version of this document.
+
+    :param sphinxcontrib.versioning.versions.Versions versions: Version class instance.
+    :param str root_ref: Branch/tag at the root of all HTML docs. Other branches/tags will be in subdirectories.
+    """
+    root_remote = versions[root_ref]
+
+    for remote in (r for r in versions.remotes if r != root_remote):
+        # Determine base message.
+        if root_remote['kind'] == 'heads':
+            banner = BANNER_ROOT_BRANCH
+        elif remote['kind'] == 'heads':
+            banner = BANNER_ROOT_TAG_ON_BRANCH
+        else:
+            banner = BANNER_ROOT_TAG_ON_TAG
+        # Append url message.
+        raise NotImplementedError
 
 
 def build_all(exported_root, destination, versions, root_ref, overflow):

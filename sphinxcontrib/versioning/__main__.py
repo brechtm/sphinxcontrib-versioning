@@ -60,7 +60,7 @@ from docopt import docopt
 from sphinxcontrib.versioning import __version__
 from sphinxcontrib.versioning.git import clone, commit_and_push, get_root, GitError
 from sphinxcontrib.versioning.lib import HandledError, TempDir
-from sphinxcontrib.versioning.routines import build_all, gather_git_info, pre_build
+from sphinxcontrib.versioning.routines import build_all, gather_git_info, pre_build, set_banners
 from sphinxcontrib.versioning.setup_logging import setup_logging
 from sphinxcontrib.versioning.versions import multi_sort, Versions
 
@@ -133,7 +133,9 @@ def main_build(config, root, destination):
 
     # Pre-build.
     log.info('Pre-running Sphinx to determine URLs.')
-    exported_root = pre_build(root, versions, root_ref, config['overflow'], config['--no-banner'])
+    exported_root = pre_build(root, versions, root_ref, config['overflow'])
+    if not config['--no-banner']:
+        set_banners(versions.remotes)
 
     # Build.
     build_all(exported_root, destination, versions, root_ref, config['overflow'])

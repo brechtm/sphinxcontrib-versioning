@@ -17,7 +17,7 @@ def test_single(local_docs):
     assert len(versions) == 1
 
     # Run and verify directory.
-    exported_root = py.path.local(pre_build(str(local_docs), versions, 'master', list(), True))
+    exported_root = py.path.local(pre_build(str(local_docs), versions, 'master', list()))
     assert len(exported_root.listdir()) == 1
     assert exported_root.join(versions['master']['sha'], 'conf.py').read() == ''
 
@@ -48,7 +48,7 @@ def test_dual(local_docs, run):
     assert len(versions) == 2
 
     # Run and verify directory.
-    exported_root = py.path.local(pre_build(str(local_docs), versions, 'master', list(), True))
+    exported_root = py.path.local(pre_build(str(local_docs), versions, 'master', list()))
     assert len(exported_root.listdir()) == 2
     assert exported_root.join(versions['master']['sha'], 'conf.py').read() == ''
     assert exported_root.join(versions['feature']['sha'], 'conf.py').read() == 'master_doc = "index"\n'
@@ -71,7 +71,7 @@ def test_file_collision(local_docs, run):
     assert len(versions) == 2
 
     # Run and verify URLs.
-    pre_build(str(local_docs), versions, 'master', list(), True)
+    pre_build(str(local_docs), versions, 'master', list())
     expected = ['_static_/contents.html', 'contents.html']
     assert sorted(r['url'] for r in versions.remotes) == expected
 
@@ -89,7 +89,7 @@ def test_invalid_name(local_docs, run):
     assert len(versions) == 2
 
     # Run and verify URLs.
-    pre_build(str(local_docs), versions, 'master', list(), True)
+    pre_build(str(local_docs), versions, 'master', list())
     expected = ['contents.html', 'robpol86_feature/contents.html']
     assert sorted(r['url'] for r in versions.remotes) == expected
 
@@ -113,8 +113,8 @@ def test_error(local_docs, run):
 
     # Bad root ref.
     with pytest.raises(HandledError):
-        pre_build(str(local_docs), versions, 'b_broken', list(), True)
+        pre_build(str(local_docs), versions, 'b_broken', list())
 
     # Remove bad non-root refs.
-    pre_build(str(local_docs), versions, 'master', list(), True)
+    pre_build(str(local_docs), versions, 'master', list())
     assert [r[0] for r in versions] == ['a_good', 'c_good', 'master']
