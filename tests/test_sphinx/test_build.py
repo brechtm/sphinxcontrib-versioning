@@ -190,3 +190,25 @@ def test_subdirs(tmpdir, local_docs):
     page = target.join('subdir', 'subdir', 'subdir', 'subdir', 'subdir', 'sub.html').read()
     assert '<li><a href="../../../../..">master</a></li>' in page
     assert '<li><a href="../../../../../feature">feature</a></li>' in page
+
+
+@pytest.mark.parametrize('no_banner', [True, False])
+def test_banner(tmpdir, local_docs, no_banner):
+    """Verify banner is and isn't included in the HTML.
+
+    :param tmpdir: pytest fixture.
+    :param local_docs: conftest fixture.
+    :param bool no_banner: Don't display a banner.
+    """
+    banner = '<b>Banner Goes Here</b>'
+    target = tmpdir.ensure_dir('target')
+    versions = Versions([('', 'master', 'heads', 1, 'conf.py')])
+
+    build(str(local_docs), str(target), versions, 'master', '' if no_banner else banner, list())
+
+    contents = target.join('contents.html').read()
+    assert '<a href=".">master</a></li>' in contents
+    if no_banner:
+        assert banner not in contents
+    else:
+        assert banner in contents

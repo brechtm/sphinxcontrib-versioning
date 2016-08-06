@@ -26,6 +26,7 @@ def test_supported(tmpdir, local_docs, run, theme):
     :param run: conftest fixture.
     :param str theme: Theme name to use.
     """
+    banner = '<b>Banner Goes Here</b>'
     target_n = tmpdir.ensure_dir('target_n')
     target_y = tmpdir.ensure_dir('target_y')
     versions = Versions([
@@ -48,11 +49,13 @@ def test_supported(tmpdir, local_docs, run, theme):
     run(local_docs, ['sphinx-build', '.', str(target_n), '-D', 'html_theme=' + theme])
     contents_n = target_n.join('contents.html').read()
     assert 'master' not in contents_n
+    assert banner not in contents_n
 
     # Build with versions.
-    build(str(local_docs), str(target_y), versions, 'master', '', ['-D', 'html_theme=' + theme])
+    build(str(local_docs), str(target_y), versions, 'master', banner, ['-D', 'html_theme=' + theme])
     contents_y = target_y.join('contents.html').read()
     assert 'master' in contents_y
+    assert banner in contents_y
 
     # Verify nothing removed.
     diff = list(difflib.unified_diff(contents_n.splitlines(True), contents_y.splitlines(True)))[2:]
