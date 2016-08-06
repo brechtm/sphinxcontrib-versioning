@@ -113,7 +113,7 @@ def test_banner(tmpdir, local_docs, theme):
     """
     if theme not in ('sphinx_rtd_theme',):
         return pytest.skip('TODO')
-    banner = '<b>Banner Goes Here</b>'
+    banner = '<b>Notice:</b> Banner Goes Here'
     target = tmpdir.ensure_dir('target')
     versions = Versions([('', 'master', 'heads', 1, 'conf.py')])
 
