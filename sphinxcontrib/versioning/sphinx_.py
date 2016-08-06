@@ -21,10 +21,12 @@ SC_VERSIONING_VERSIONS = list()  # Updated after forking.
 class EventHandlers(object):
     """Hold Sphinx event handlers as static or class methods.
 
+    :ivar str BANNER: Banner to display.
     :ivar str CURRENT_VERSION: Current version being built.
     :ivar iter VERSIONS: List of version dicts.
     """
 
+    BANNER = None
     CURRENT_VERSION = None
     VERSIONS = None
 
@@ -55,6 +57,7 @@ class EventHandlers(object):
         :param iter args: Additional arguments given by Sphinx.
         """
         context = args[1]
+        context['banner'] = cls.BANNER
         context['bitbucket_version'] = cls.CURRENT_VERSION
         context['current_version'] = cls.CURRENT_VERSION
         context['github_version'] = cls.CURRENT_VERSION
@@ -109,10 +112,9 @@ def _build(argv, versions, current_name, banner):
     :param str current_name: The ref name of the current version being built.
     :param str banner: Display a banner at the top of every page with this message if set.
     """
-    if banner:
-        raise NotImplementedError
     # Patch.
     application.Config = ConfigInject
+    EventHandlers.BANNER = banner
     EventHandlers.CURRENT_VERSION = current_name
     EventHandlers.VERSIONS = versions
     SC_VERSIONING_VERSIONS[:] = list(versions)

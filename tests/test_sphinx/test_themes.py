@@ -7,8 +7,7 @@ import pytest
 from sphinxcontrib.versioning.sphinx_ import build
 from sphinxcontrib.versioning.versions import Versions
 
-
-@pytest.mark.parametrize('theme', [
+THEMES = [
     'alabaster',
     'sphinx_rtd_theme',
     'classic',
@@ -17,7 +16,10 @@ from sphinxcontrib.versioning.versions import Versions
     'nature',
     'pyramid',
     'bizstyle',
-])
+]
+
+
+@pytest.mark.parametrize('theme', THEMES)
 def test_supported(tmpdir, local_docs, run, theme):
     """Test with different themes. Verify not much changed between sphinx-build and sphinx-versioning.
 
@@ -26,7 +28,6 @@ def test_supported(tmpdir, local_docs, run, theme):
     :param run: conftest fixture.
     :param str theme: Theme name to use.
     """
-    banner = '<b>Banner Goes Here</b>'
     target_n = tmpdir.ensure_dir('target_n')
     target_y = tmpdir.ensure_dir('target_y')
     versions = Versions([
@@ -49,13 +50,11 @@ def test_supported(tmpdir, local_docs, run, theme):
     run(local_docs, ['sphinx-build', '.', str(target_n), '-D', 'html_theme=' + theme])
     contents_n = target_n.join('contents.html').read()
     assert 'master' not in contents_n
-    assert banner not in contents_n
 
     # Build with versions.
-    build(str(local_docs), str(target_y), versions, 'master', banner, ['-D', 'html_theme=' + theme])
+    build(str(local_docs), str(target_y), versions, 'master', '', ['-D', 'html_theme=' + theme])
     contents_y = target_y.join('contents.html').read()
     assert 'master' in contents_y
-    assert banner in contents_y
 
     # Verify nothing removed.
     diff = list(difflib.unified_diff(contents_n.splitlines(True), contents_y.splitlines(True)))[2:]
@@ -102,3 +101,22 @@ def test_sphinx_rtd_theme(tmpdir, local_docs):
     contents = target_bt.join('contents.html').read()
     assert '<dt>Branches</dt>' in contents
     assert '<dt>Tags</dt>' in contents
+
+
+@pytest.mark.parametrize('theme', THEMES)
+def test_banner(tmpdir, local_docs, theme):
+    """Test displaying the banner.
+
+    :param tmpdir: pytest fixture.
+    :param local_docs: conftest fixture.
+    :param str theme: Theme name to use.
+    """
+    banner = '<b>Banner Goes Here</b>'
+    target = tmpdir.ensure_dir('target_y')
+    versions = Versions([('', 'master', 'heads', 1, 'conf.py')])
+
+    # Build.
+    build(str(local_docs), str(target), versions, 'master', banner, ['-D', 'html_theme=' + theme])
+    contents = target.join('contents.html').read()
+    assert 'master' in contents
+    assert banner in contents
