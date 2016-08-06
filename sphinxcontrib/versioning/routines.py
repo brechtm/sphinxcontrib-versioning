@@ -144,7 +144,7 @@ def build_all(exported_root, destination, versions, root_ref, overflow):
             source = os.path.dirname(os.path.join(exported_root, remote['sha'], remote['conf_rel_path']))
             target = os.path.join(destination, os.path.dirname(remote['url']))
             try:
-                build(source, target, versions.copy(1), remote['name'], '', overflow)
+                build(source, target, versions.copy(1), remote['name'], remote['banner'], overflow)
             except HandledError:
                 log.warning('Skipping. Will not be building %s. Rebuilding everything.', remote['name'])
                 versions.remotes.pop(versions.remotes.index(remote))

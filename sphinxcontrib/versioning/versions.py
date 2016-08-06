@@ -91,6 +91,7 @@ class Versions(object):
     """Iterable class that holds all versions and handles sorting and filtering. To be fed into Sphinx's Jinja2 env.
 
     URLs are just '.' initially. Set after instantiation by another function elsewhere. Will be relative URL path.
+    Banners are empty strings initially (disabled). Conditionally set after instantiation by another function.
 
     :ivar iter remotes: List of dicts for every branch/tag.
     """
@@ -110,6 +111,7 @@ class Versions(object):
             kind=r[2],
             date=r[3],
             conf_rel_path=r[4],
+            banner='',
             url='.',
         ) for r in remotes]
 
