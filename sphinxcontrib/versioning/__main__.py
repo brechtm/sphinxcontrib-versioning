@@ -135,7 +135,7 @@ def main_build(config, root, destination):
     log.info('Pre-running Sphinx to determine URLs.')
     exported_root = pre_build(root, versions, root_ref, config['overflow'])
     if not config['--no-banner']:
-        set_banners(versions.remotes)
+        set_banners(versions.remotes, root_ref)
 
     # Build.
     build_all(exported_root, destination, versions, root_ref, config['overflow'])

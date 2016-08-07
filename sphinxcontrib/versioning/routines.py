@@ -147,18 +147,19 @@ def set_banners(versions, root_ref):
     :param sphinxcontrib.versioning.versions.Versions versions: Version class instance.
     :param str root_ref: Branch/tag at the root of all HTML docs. Other branches/tags will be in subdirectories.
     """
-    root_remote = versions[root_ref]
-
-    for remote in (r for r in versions.remotes if r != root_remote):
-        # Determine base message.
-        if root_remote['kind'] == 'heads':
-            banner = BANNER_ROOT_BRANCH
-        elif remote['kind'] == 'heads':
-            banner = BANNER_ROOT_TAG_ON_BRANCH
-        else:
-            banner = BANNER_ROOT_TAG_ON_TAG
-        # Append url message.
-        raise NotImplementedError
+    # for remote in (r for r in versions.remotes if r != root_remote):
+    #     # Determine base message.
+    #     if root_remote['kind'] == 'heads':
+    #         banner = BANNER_ROOT_BRANCH
+    #     elif remote['kind'] == 'heads':
+    #         banner = BANNER_ROOT_TAG_ON_BRANCH
+    #     else:
+    #         banner = BANNER_ROOT_TAG_ON_TAG
+    #     # Append url message.
+    #     # raise NotImplementedError(banner)
+    #     assert banner
+    assert versions
+    assert root_ref
 
 
 def build_all(exported_root, destination, versions, root_ref, overflow):
