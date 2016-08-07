@@ -91,9 +91,9 @@ class Versions(object):
     """Iterable class that holds all versions and handles sorting and filtering. To be fed into Sphinx's Jinja2 env.
 
     URLs are just '.' initially. Set after instantiation by another function elsewhere. Will be relative URL path.
-    Banners are empty strings initially (disabled). Conditionally set after instantiation by another function.
 
     :ivar iter remotes: List of dicts for every branch/tag.
+    :ivar dict root_remote: Branch/tag at the root of all HTML docs.
     """
 
     def __init__(self, remotes, sort=None, prioritize=None, invert=False):
@@ -105,15 +105,17 @@ class Versions(object):
         :param bool invert: Invert sorted/grouped remotes at the end of processing.
         """
         self.remotes = [dict(
-            id='/'.join(r[2:0:-1]),  # kind/name
-            sha=r[0],
-            name=r[1],
-            kind=r[2],
-            date=r[3],
-            conf_rel_path=r[4],
-            banner='',
-            url='.',
+            id='/'.join(r[2:0:-1]),  # str; kind/name
+            sha=r[0],  # str
+            name=r[1],  # str
+            kind=r[2],  # str
+            date=r[3],  # int
+            conf_rel_path=r[4],  # str
+            banner='',  # str
+            found_docs=tuple(),  # tuple of str
+            url='.',  # str
         ) for r in remotes]
+        self.root_remote = None
 
         # Sort one or more times.
         if sort:
@@ -180,19 +182,42 @@ class Versions(object):
         """Return list of (name and urls) only tags."""
         return [(r['name'], r['url']) for r in self.remotes if r['kind'] == 'tags']
 
-    def copy(self, sub_depth=0):
+    def copy(self, sub_depth=0, pagename=None):
         """Duplicate class and self.remotes dictionaries. Prepend '../' to all URLs n times.
 
+        If current pagename is available in another version, link directly to that page instead of master_doc.
+
         :param int sub_depth: Subdirectory depth. 1 == ../, 2 == ../../,
+        :param str pagename: Name of the page being rendered (without .html or any file extension).
 
         :return: Versions
         """
         new = self.__class__([])
-        for remote in (r.copy() for r in self.remotes):
+        for remote_old, remote_new in ((r, r.copy()) for r in self.remotes):
+            new.remotes.append(remote_new)
+
+            # Handle sub_depth URL.
             if sub_depth > 0:
-                path = '/'.join(['..'] * sub_depth + [remote['url']])
+                path = '/'.join(['..'] * sub_depth + [remote_new['url']])
                 if path.endswith('/.'):
                     path = path[:-2]
-                remote['url'] = path
-            new.remotes.append(remote)
+                remote_new['url'] = path
+
+            # Handle pagename URL.
+            if remote_new['url'].endswith('.html') and pagename in remote_new['found_docs']:
+                if '/' in remote_new['url']:
+                    remote_new['url'] = '{}/{}.html'.format(remote_new['url'].rsplit('/', 1)[0], pagename)
+                else:
+                    remote_new['url'] = '{}.html'.format(pagename)
+
+            # Handle root_remote.
+            if self.root_remote == remote_old:
+                new.root_remote = remote_new
         return new
+
+    def set_root_remote(self, root_ref):
+        """Set the root remote based on the root ref.
+
+        :param str root_ref: Branch/tag at the root of all HTML docs.
+        """
+        self.root_remote = self[root_ref]
