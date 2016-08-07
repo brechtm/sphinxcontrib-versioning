@@ -9,6 +9,7 @@
 {% set banner_message = 'TODO' %}
 
 {# Display banner. #}
+{% block banner %}
 <p style="
     border-radius: 2px;
     font-size: 80%;
@@ -26,3 +27,4 @@
     );
     background-size: 28px 28px;
 ">{{ banner_message }}</p>
+{% endblock %}
