@@ -1,0 +1,22 @@
+{% if html_theme == 'sphinx_rtd_theme' %}
+    {% set banner_color = ('white', '#2980B9') %}
+{% else %}
+    {% set banner_color = ('white', '#d40') %}
+{% endif %}
+<p style="
+    border-radius: 2px;
+    font-size: 80%;
+    color: {{ banner_color[0] }};
+    text-align: center;
+    background: {{ banner_color[1] }} linear-gradient(-45deg,
+        rgba(255, 255, 255, 0.2) 0%,
+        rgba(255, 255, 255, 0.2) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.2) 75%,
+        transparent 75%,
+        transparent
+    );
+    background-size: 28px 28px;
+">{{ banner }}</p>
