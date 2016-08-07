@@ -10,6 +10,11 @@ from sphinxcontrib.versioning.git import export, fetch_commits, filter_and_date,
 from sphinxcontrib.versioning.lib import HandledError, TempDir
 from sphinxcontrib.versioning.sphinx_ import build, read_config
 
+BANNER_ROOT_BRANCH = 'Warning: This document is for the development version of {project}.'
+BANNER_ROOT_BRANCH_ROOT_EXISTS = ' <a href="{url}">Click here</a> for the main version of this document.'
+BANNER_ROOT_TAG_ON_BRANCH = 'Warning: This document is for the development version of {project}.'
+BANNER_ROOT_TAG_ON_TAG = 'Warning: This document is for an old version of {project}.'
+BANNER_ROOT_TAG_ROOT_EXISTS = ' The latest version is <a href="{url}">{version}</a>.'
 RE_INVALID_FILENAME = re.compile(r'[^0-9A-Za-z.-]')
 
 
@@ -118,6 +123,29 @@ def pre_build(local_root, versions, overflow):
         remote['found_docs'] = config['found_docs']
 
     return exported_root
+
+
+def set_banners(versions):
+    """Set banner messages.
+
+    :param sphinxcontrib.versioning.versions.Versions versions: Versions class instance.
+    """
+    for remote in (r for r in versions.remotes if r != versions.root_remote):
+        # Determine base message.
+        if versions.root_remote['kind'] == 'heads':
+            banner = BANNER_ROOT_BRANCH
+        elif remote['kind'] == 'heads':
+            banner = BANNER_ROOT_TAG_ON_BRANCH
+        else:
+            banner = BANNER_ROOT_TAG_ON_TAG
+        for pagename in remote['found_docs']:
+            remote['banners'][pagename] = banner
+        # Handle page-specific messages.
+        for pagename in (p for p in remote['found_docs'] if p in versions.root_remote['found_docs']):
+            if versions.root_remote['kind'] == 'heads':
+                remote['banners'][pagename] += BANNER_ROOT_BRANCH_ROOT_EXISTS
+            else:
+                remote['banners'][pagename] += BANNER_ROOT_TAG_ROOT_EXISTS
 
 
 def build_all(exported_root, destination, versions, overflow):
