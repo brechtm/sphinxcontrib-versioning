@@ -110,6 +110,7 @@ class Versions(object):
             name=r[1],  # str
             kind=r[2],  # str
             date=r[3],  # int
+            banners=dict(),  # dict of str=>str; pagename=>message
             conf_rel_path=r[4],  # str
             found_docs=tuple(),  # tuple of str
             url='.',  # str
