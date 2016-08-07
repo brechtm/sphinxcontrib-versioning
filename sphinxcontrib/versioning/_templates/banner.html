@@ -1,8 +1,14 @@
+{# Set banner color. #}
 {% if html_theme == 'sphinx_rtd_theme' %}
     {% set banner_color = ('white', '#2980B9') %}
 {% else %}
     {% set banner_color = ('white', '#d40') %}
 {% endif %}
+
+{# Set banner message #}
+{% set banner_message = 'TODO' %}
+
+{# Display banner. #}
 <p style="
     border-radius: 2px;
     font-size: 80%;
@@ -19,4 +25,4 @@
         transparent
     );
     background-size: 28px 28px;
-">{{ banner }}</p>
+">{{ banner_message }}</p>

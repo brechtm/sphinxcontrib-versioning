@@ -112,6 +112,7 @@ class Versions(object):
             date=r[3],  # int
             conf_rel_path=r[4],  # str
             found_docs=tuple(),  # tuple of str
+            show_banner=False,
             url='.',  # str
         ) for r in remotes]
         self.root_remote = None

@@ -25,6 +25,7 @@ Usage:
     {program} -V | --version
 
 Options:
+    -B --no-banner          Disable showing a warning banner on non-root-refs.
     -c DIR --chdir=DIR      cd into this directory before running.
     -C --no-colors          Disable colors in terminal output.
     -e F --grm-exclude=FILE Push only. If specified "git rm" will delete all
@@ -134,6 +135,9 @@ def main_build(config, root, destination):
     # Pre-build.
     log.info('Pre-running Sphinx to determine URLs.')
     exported_root = pre_build(root, versions, config['overflow'])
+    # if not config['--no-banner']:
+    #     for remote in (r for r in versions.remotes if r != versions.root_remote):
+    #         remote['show_banner'] = True
 
     # Build.
     build_all(exported_root, destination, versions, config['overflow'])

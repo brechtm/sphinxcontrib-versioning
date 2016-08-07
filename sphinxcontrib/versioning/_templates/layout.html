@@ -3,6 +3,6 @@
 
 {# Prepend banner to body. #}
 {%- set body %}
-    {%- if banner %}{%- include "banner.html" %}{% endif %}
+    {%- if scv_show_banner %}{%- include "banner.html" %}{% endif %}
     {%- block body %}{% endblock %}  {# Sphinx overrides body block without calling super(). #}
 {% endset %}

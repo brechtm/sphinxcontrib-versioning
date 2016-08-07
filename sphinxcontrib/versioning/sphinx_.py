@@ -89,6 +89,7 @@ class EventHandlers(object):
         context['scv_is_tag'] = this_remote['kind'] == 'tags'
         context['scv_root_ref_is_branch'] = versions.root_remote['kind'] == 'heads'
         context['scv_root_ref_is_tag'] = versions.root_remote['kind'] == 'tags'
+        context['scv_show_banner'] = this_remote['show_banner']
         context['versions'] = versions
 
 

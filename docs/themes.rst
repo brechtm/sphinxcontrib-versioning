@@ -41,6 +41,11 @@ variables are exposed:
 
     A boolean set to True if the root ref is from a git tag.
 
+.. attribute:: scv_show_banner
+
+    A boolean set to True if the :ref:`banner <banner>` is to be displayed at the top of every page on versions that
+    aren't the :option:`--root-ref`.
+
 .. attribute:: versions
 
     An iterable that yields 2-item tuples of strings. The first item is the version (branch/tag) name while the second
@@ -125,3 +130,10 @@ Below are screen shots of the supported built-in themes.
     :target: _images/traditional.png
 
     traditional
+
+.. _banner:
+
+Banner
+======
+
+TODO
