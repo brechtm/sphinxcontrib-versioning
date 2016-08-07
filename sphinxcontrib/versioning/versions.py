@@ -194,6 +194,7 @@ class Versions(object):
         """
         new = self.__class__([])
         for remote_old, remote_new in ((r, r.copy()) for r in self.remotes):
+            remote_new['banners'] = remote_old['banners'].copy()
             new.remotes.append(remote_new)
 
             # Handle sub_depth URL.
