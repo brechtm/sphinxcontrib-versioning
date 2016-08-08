@@ -123,6 +123,8 @@ def main_build(config, root, destination):
         candidates = [r for r in versions.remotes if r['kind'] == 'tags']
         if not candidates:
             log.warning('No git tags with docs found in remote. Falling back to --root-ref value.')
+            GlobalConfig.GREATEST_TAG = False
+            GlobalConfig.RECENT_TAG = False
         else:
             multi_sort(candidates, ['semver' if config['--greatest-tag'] else 'chrono'])
             root_ref = candidates[0]['name']
@@ -204,9 +206,6 @@ def main(config):
             raise HandledError
     log.debug('Working directory: %s', os.getcwd())
 
-    # Update global config.
-    GlobalConfig.NO_BANNER = config['--no-banner']
-
     # Get root.
     try:
         root = get_root(os.getcwd())
@@ -239,6 +238,9 @@ def entry_point():
     try:
         config = get_arguments(sys.argv, __doc__)
         setup_logging(verbose=config['--verbose'], colors=not config['--no-colors'])
+        GlobalConfig.GREATEST_TAG = config['--greatest-tag']
+        GlobalConfig.NO_BANNER = config['--no-banner']
+        GlobalConfig.RECENT_TAG = config['--recent-tag']
         main(config)
         logging.info('Success.')
     except HandledError:

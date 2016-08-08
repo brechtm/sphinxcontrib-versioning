@@ -7,4 +7,6 @@ class GlobalConfig(object):
     Only define values set by external configuration sources.
     """
 
+    GREATEST_TAG = False
     NO_BANNER = False
+    RECENT_TAG = False
