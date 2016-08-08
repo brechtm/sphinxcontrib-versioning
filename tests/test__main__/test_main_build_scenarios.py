@@ -366,6 +366,36 @@ def test_add_remove_docs(tmpdir, local_docs, run):
     assert '<li><a href="../v2.0.0/contents.html">v2.0.0</a></li>' in contents
 
 
+@pytest.mark.parametrize('no_banner', [True, False])
+def test_banner(tmpdir, local_docs, run, no_banner):
+    """Make sure banner toggle actually works.
+
+    :param tmpdir: pytest fixture.
+    :param local_docs: conftest fixture.
+    :param run: conftest fixture.
+    :param bool no_banner: Set --no-banner.
+    """
+    run(local_docs, ['git', 'tag', 'v1.0.0'])
+    run(local_docs, ['git', 'push', 'origin', 'v1.0.0'])
+
+    # Run.
+    destination = tmpdir.ensure_dir('destination')
+    command = ['sphinx-versioning', 'build', str(destination), '.'] + (['--no-banner'] if no_banner else [])
+    output = run(local_docs, command)
+    assert 'Traceback' not in output
+
+    # Verify root ref has no banner regardless of flag.
+    contents = destination.join('contents.html').read()
+    assert 'scv-banner' not in contents
+
+    # Verify v1.0.0.
+    contents = destination.join('v1.0.0', 'contents.html').read()
+    if no_banner:
+        assert 'scv-banner' not in contents
+    else:
+        pass  # assert 'scv-banner' in contents TODO
+
+
 def test_error_bad_path(tmpdir, run):
     """Test handling of bad paths.
 
