@@ -8,9 +8,16 @@
 {# Set banner message #}
 {% if not scv_is_root_ref %}
     {% if scv_is_branch %}
-        {% set banner_message = '<b>Warning:</b> This document is for the development version of {project}.' %}
+        {% set banner_message = '<b>Warning:</b> This document is for the development version of %s.' % project %}
     {% else %}
-        {% set banner_message = '<b>Warning:</b> This document is for an old version of {project}.' %}
+        {% set banner_message = '<b>Warning:</b> This document is for an old version of %s.' % project %}
+    {% endif %}
+    {% if pagename in versions.root_remote['found_docs'] %}
+        {% if scv_root_ref_is_branch %}
+            {% set banner_message = banner_message + ' <a href="{url}">Click here</a> for the main version of this document.' %}
+        {% else %}
+            {% set banner_message = banner_message + ' The latest version is <a href="{url}">%s</a>.' % versions.root_remote['name'] %}
+        {% endif %}
     {% endif %}
 {% endif %}
 
