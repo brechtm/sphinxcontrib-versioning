@@ -393,7 +393,7 @@ def test_banner(tmpdir, local_docs, run, no_banner):
     if no_banner:
         assert 'scv-banner' not in contents
     else:
-        pass  # assert 'scv-banner' in contents TODO
+        assert 'scv-banner' in contents
 
 
 def test_error_bad_path(tmpdir, run):

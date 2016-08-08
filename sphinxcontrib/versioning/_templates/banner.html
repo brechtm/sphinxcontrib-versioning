@@ -8,9 +8,14 @@
 {# Set banner message #}
 {% set banner_message = 'TODO' %}
 
+{# Determine is banner should be shown. #}
+{% set show_banner = not scv_is_root_ref %}
+
 {# Display banner. #}
 {% block banner %}
-<p class="scv-banner" style="color: {{ banner_color[0] }}; background-color: {{ banner_color[1] }};">
-    {{ banner_message }}
-</p>
+{% if show_banner %}
+    <p class="scv-banner" style="color: {{ banner_color[0] }}; background-color: {{ banner_color[1] }};">
+        {{ banner_message }}
+    </p>
+{% endif %}
 {% endblock %}
