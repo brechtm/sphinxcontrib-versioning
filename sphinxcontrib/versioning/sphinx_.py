@@ -137,6 +137,8 @@ def _build(argv, versions, current_name):
     :param sphinxcontrib.versioning.versions.Versions versions: Versions class instance.
     :param str current_name: The ref name of the current version being built.
     """
+    GlobalConfig.NO_BANNER = True  # TODO
+
     # Patch.
     application.Config = ConfigInject
     EventHandlers.CURRENT_VERSION = current_name
