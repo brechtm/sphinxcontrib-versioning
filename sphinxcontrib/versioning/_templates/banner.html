@@ -6,14 +6,17 @@
 {% endif %}
 
 {# Set banner message #}
-{% set banner_message = 'TODO' %}
-
-{# Determine is banner should be shown. #}
-{% set show_banner = not scv_is_root_ref %}
+{% if not scv_is_root_ref %}
+    {% if scv_is_branch %}
+        {% set banner_message = '<b>Warning:</b> This document is for the development version of {project}.' %}
+    {% else %}
+        {% set banner_message = '<b>Warning:</b> This document is for an old version of {project}.' %}
+    {% endif %}
+{% endif %}
 
 {# Display banner. #}
 {% block banner %}
-{% if show_banner %}
+{% if banner_message %}
     <p class="scv-banner" style="color: {{ banner_color[0] }}; background-color: {{ banner_color[1] }};">
         {{ banner_message }}
     </p>
