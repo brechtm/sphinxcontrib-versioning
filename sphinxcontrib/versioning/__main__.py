@@ -58,6 +58,7 @@ import time
 from docopt import docopt
 
 from sphinxcontrib.versioning import __version__
+from sphinxcontrib.versioning.configuration import GlobalConfig
 from sphinxcontrib.versioning.git import clone, commit_and_push, get_root, GitError
 from sphinxcontrib.versioning.lib import HandledError, TempDir
 from sphinxcontrib.versioning.routines import build_all, gather_git_info, pre_build
@@ -135,9 +136,6 @@ def main_build(config, root, destination):
     # Pre-build.
     log.info('Pre-running Sphinx to determine URLs.')
     exported_root = pre_build(root, versions, config['overflow'])
-    # if not config['--no-banner']:
-    #     for remote in (r for r in versions.remotes if r != versions.root_remote):
-    #         remote['show_banner'] = True
 
     # Build.
     build_all(exported_root, destination, versions, config['overflow'])
@@ -205,6 +203,9 @@ def main(config):
                 log.error('Path not a directory: %s', config['--chdir'])
             raise HandledError
     log.debug('Working directory: %s', os.getcwd())
+
+    # Update global config.
+    GlobalConfig.NO_BANNER = config['--no-banner']
 
     # Get root.
     try:
