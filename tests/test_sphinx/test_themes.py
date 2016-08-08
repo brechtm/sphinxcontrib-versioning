@@ -105,3 +105,24 @@ def test_sphinx_rtd_theme(tmpdir, local_docs):
     contents = target_bt.join('contents.html').read()
     assert '<dt>Branches</dt>' in contents
     assert '<dt>Tags</dt>' in contents
+
+
+@pytest.mark.parametrize('theme', THEMES)
+def test_banner(tmpdir, local_docs, theme):
+    """Test displaying the banner.
+
+    :param tmpdir: pytest fixture.
+    :param local_docs: conftest fixture.
+    :param str theme: Theme name to use.
+    """
+    if theme != 'sphinx_rtd_theme':
+        return pytest.skip('todo')
+    target = tmpdir.ensure_dir('target')
+    versions = Versions([('', 'master', 'heads', 1, 'conf.py')])
+    versions.set_root_remote('master')
+
+    # Build.
+    build(str(local_docs), str(target), versions, 'master', ['-D', 'html_theme=' + theme])
+    contents = target.join('contents.html').read()
+    assert 'master' in contents
+    # assert 'replace me banner' in contents

@@ -45,6 +45,11 @@ class EventHandlers(object):
         app.builder.templates.loaders.insert(0, SphinxFileSystemLoader(templates_dir))
         app.builder.templates.templatepathlen += 1
 
+        # Conditionally add this extension's _static directory to Sphinx.
+        if not GlobalConfig.NO_BANNER:
+            app.config.html_static_path.append(os.path.join(os.path.dirname(__file__), '_static'))
+            app.add_stylesheet('banner.css')
+
         # Add versions.html to sidebar.
         if '**' not in app.config.html_sidebars:
             app.config.html_sidebars['**'] = StandaloneHTMLBuilder.default_sidebars + ['versions.html']
