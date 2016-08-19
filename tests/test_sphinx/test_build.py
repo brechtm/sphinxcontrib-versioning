@@ -21,7 +21,7 @@ def test_simple(tmpdir, local_docs, no_feature):
     )
     versions.set_root_remote('master')
 
-    build(str(local_docs), str(target), versions, 'master')
+    build(str(local_docs), str(target), versions, 'master', True)
 
     contents = target.join('contents.html').read()
     assert '<a href="contents.html">master</a></li>' in contents
@@ -45,7 +45,7 @@ def test_isolation(tmpdir, config, local_docs, project):
     versions = Versions([('', 'master', 'heads', 1, 'conf.py')])
     versions.set_root_remote('master')
 
-    build(str(local_docs), str(target), versions, 'master')
+    build(str(local_docs), str(target), versions, 'master', True)
 
     contents = target.join('contents.html').read()
     if project:
@@ -68,7 +68,7 @@ def test_overflow(tmpdir, config, local_docs):
     versions = Versions([('', 'master', 'heads', 1, 'conf.py')])
     versions.set_root_remote('master')
 
-    build(str(local_docs), str(target), versions, 'master')
+    build(str(local_docs), str(target), versions, 'master', True)
 
     contents = target.join('contents.html').read()
     assert '2016, SCV' in contents
@@ -86,7 +86,7 @@ def test_sphinx_error(tmpdir, local_docs):
     local_docs.join('conf.py').write('undefined')
 
     with pytest.raises(HandledError):
-        build(str(local_docs), str(target), versions, 'master')
+        build(str(local_docs), str(target), versions, 'master', True)
 
 
 @pytest.mark.parametrize('pre_existing_versions', [False, True])
@@ -113,7 +113,7 @@ def test_custom_sidebar(tmpdir, local_docs, pre_existing_versions):
         )
     local_docs.ensure('_templates', 'custom.html').write('<h3>Custom Sidebar</h3><ul><li>Test</li></ul>')
 
-    build(str(local_docs), str(target), versions, 'master')
+    build(str(local_docs), str(target), versions, 'master', True)
 
     contents = target.join('contents.html').read()
     assert '<li><a href="contents.html">master</a></li>' in contents
@@ -143,13 +143,13 @@ def test_versions_override(tmpdir, local_docs):
     )
 
     target = tmpdir.ensure_dir('target_master')
-    build(str(local_docs), str(target), versions, 'master')
+    build(str(local_docs), str(target), versions, 'master', True)
     contents = target.join('contents.html').read()
     assert '<li>GitHub: master</li>' in contents
     assert '<li>BitBucket: master</li>' in contents
 
     target = tmpdir.ensure_dir('target_feature')
-    build(str(local_docs), str(target), versions, 'feature')
+    build(str(local_docs), str(target), versions, 'feature', False)
     contents = target.join('contents.html').read()
     assert '<li>GitHub: feature</li>' in contents
     assert '<li>BitBucket: feature</li>' in contents
@@ -181,7 +181,7 @@ def test_subdirs(tmpdir, local_docs):
             'Sub directory sub page documentation.\n'
         )
 
-    build(str(local_docs), str(target), versions, 'master')
+    build(str(local_docs), str(target), versions, 'master', True)
 
     contents = target.join('contents.html').read()
     assert '<li><a href="contents.html">master</a></li>' in contents
