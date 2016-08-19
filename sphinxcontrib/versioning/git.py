@@ -289,7 +289,7 @@ def export(local_root, commit, target):
             if not os.path.exists(t_dirpath):
                 os.makedirs(t_dirpath)
             for args in ((os.path.join(s_dirpath, f), os.path.join(t_dirpath, f)) for f in s_filenames):
-                shutil.copy(*args)
+                shutil.copy(*args, follow_symlinks=False)
 
 
 def clone(local_root, new_root, branch, rel_dest, exclude):
